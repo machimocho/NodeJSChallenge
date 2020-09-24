@@ -68,8 +68,8 @@ UsuarioSchema.methods.generarToken = async function () {
 }
 
 //Encontrar un usuario por correo y contraseña
-UsuarioSchema.statics.encontrarCredenciales = async (email, password) => {
-    const usuario = await Usuario.findOne({ email })
+UsuarioSchema.statics.encontrarCredenciales = async (username, password) => {
+    const usuario = await Usuario.findOne({ username })
 
     if (!usuario) {
         throw new AppError('Usuario no existe', 400)

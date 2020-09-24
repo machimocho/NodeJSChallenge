@@ -12,7 +12,7 @@ router.post('/login', usuarioController.login)
 
 //Ruta de acceso al sistema
 router.get('/sistema', verificar, (req, res) => {
-    res.send('Área segura')
+    res.send('Valid Token')
 })
 
 //Cerrar una sesión
