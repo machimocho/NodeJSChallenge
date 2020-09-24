@@ -23,7 +23,7 @@ const obtenerSalas = catchAsync(async (req, res) => {
 
     // If there is no chat room, create one
     if (salas.length < 1){
-        let defaultRoom = {'room': 'Home'}
+        let defaultRoom = {'room': 'Soccer'}
         const nuevaSala = new Sala(defaultRoom)
         await nuevaSala.save()
         salas = await Sala.find({}).sort({room: "asc"})
