@@ -19,12 +19,12 @@ const registrar = catchAsync(async (req, res) => {
 })
 
 const obtenerSalas = catchAsync(async (req, res) => {
-    const salas = await Sala.find({}).sort({room: "asc"})
+    let salas = await Sala.find({},'room').sort({room: "asc"})
 
     // If there is no chat room, create one
-    if (!salas){
+    if (salas.length < 1){
         let defaultRoom = {'room': 'Home'}
-        const nuevaSala = new Sala({defaultRoom})
+        const nuevaSala = new Sala(defaultRoom)
         await nuevaSala.save()
         salas = await Sala.find({}).sort({room: "asc"})
     }

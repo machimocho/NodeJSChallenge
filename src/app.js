@@ -6,6 +6,7 @@ const cors = require('cors')
 //Cargar rutas
 const rutasUsuario = require('./rutas/usuario')
 const rutasSala = require('./rutas/sala')
+const rutasMensaje = require('./rutas/mensaje')
 
 const manejarErrores = require('./middlewares/manejarErrores')
 const {AppError} = require('./utils/errores');
@@ -25,6 +26,7 @@ app.get(ruta + '/', (req, res) => {
 
 app.use(ruta + '/usuarios',rutasUsuario)
 app.use(ruta + '/salas',rutasSala)
+app.use(ruta + '/mensajes',rutasMensaje)
 
 app.all(ruta + '*', (req, res, next) => {
     next(new AppError(`La ruta ${req.originalUrl} no está disponible`, 404))

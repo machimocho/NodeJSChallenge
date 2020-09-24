@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
-const { AppError } = require("../utils/errores")
 
 mongoose.set('useCreateIndex', true)
 
 const SalaSchema = new mongoose.Schema({
     room:{
-        type: mongoose.ObjectId,
+        type: String,
         required: true,
-        unique: true
+        minlength: 1,
+        trim: true
     }
 }, {
     timestamps: true
