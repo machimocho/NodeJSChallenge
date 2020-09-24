@@ -13,5 +13,5 @@ const publicPath = path.join(__dirname, '../public')
 app.use(express.static(publicPath))
 
 server.listen(port, () => {
-    console.log(`Server running on port --> ${port}`)
+    console.log(`Chat server running on port --> ${port}`)
 })
