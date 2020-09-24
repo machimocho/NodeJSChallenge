@@ -25,15 +25,15 @@ const registrar = catchAsync(async (req, res) => {
 
 const login = catchAsync(async (req, res) => {
     //Obtener valores
-    const {email, password} = req.body
+    const {username, password} = req.body
 
     //Verificar usuario
-    const usuarioEncontrado = await Usuario.encontrarCredenciales(email, password)
+    const usuarioEncontrado = await Usuario.encontrarCredenciales(username, password)
     const token = await usuarioEncontrado.generarToken()
     
     //Preparar los datos a enviar
     let datos = {}
-    datos['mensaje'] = 'Usuario Autorizado'
+    datos['mensaje'] = 'Authorized User'
     datos['token'] = token
 
     res.status(200).json(datos)
