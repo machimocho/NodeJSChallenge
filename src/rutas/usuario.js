@@ -5,6 +5,7 @@ const usuarioController = require('../controladores/usuario')
 
 const verificar = require('../middlewares/verificar')
 const {AppError} = require('../utils/errores')
+
 router.post('/', usuarioController.registrar)
 
 router.post('/login', usuarioController.login)

@@ -1,13 +1,17 @@
 const mongoose = require('mongoose')
-const { AppError } = require("../utils/errores")
 
 mongoose.set('useCreateIndex', true)
 
 const MensajeSchema = new mongoose.Schema({
-    username:{
+    user:{
         type: mongoose.ObjectId,
         required: true,
         ref: 'Usuario'
+    },
+    room:{
+        type: mongoose.ObjectId,
+        required: true,
+        ref: 'Sala'
     },
     message: {
         type: String,
