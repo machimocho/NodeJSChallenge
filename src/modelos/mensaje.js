@@ -9,6 +9,11 @@ const MensajeSchema = new mongoose.Schema({
         required: true,
         ref: 'Usuario'
     },
+    room:{
+        type: mongoose.ObjectId,
+        required: true,
+        ref: 'Sala'
+    },
     message: {
         type: String,
         required: true,
