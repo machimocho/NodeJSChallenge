@@ -1,0 +1,38 @@
+.chat__main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.chat__sidebar {
+    overflow-y: scroll;
+    width: 100%;
+}
+
+.chat__messages {
+    flex-grow: 1;
+    overflow-y: scroll;
+    width: 100%;
+    color: blue;
+}
+
+
+
+.message {
+    margin-bottom: 16px;   
+}
+
+.message__name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 8px;
+}
+
+.message__meta {
+    color: #777;
+    font-size: 14px;
+}
+
+.message a {
+    color: #0070CC;
+}

@@ -1,4 +1,4 @@
-const socket = io()
+const socket = io();
 
 // Verify valid token
 let token = localStorage.getItem("Jobsity-Token");
@@ -30,18 +30,16 @@ const getRooms = (pRoom) => {
       beforeSend: function (xhr) {
         xhr.setRequestHeader("Authorization", `Bearer ${token}`);
       },
-      url: `/api/v1/salas`
+      url: `/api/v1/salas`,
     })
       .done(function (rooms) {
-
         // Update UI
         rooms.map((room) => {
           $("#sRoom").append(new Option(room.room, room._id));
         });
 
         // If sent, select a room
-        if (pRoom)
-            $("#sRoom").val(pRoom);
+        if (pRoom) $("#sRoom").val(pRoom);
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         alert(jqXHR.responseJSON.message);
@@ -49,39 +47,160 @@ const getRooms = (pRoom) => {
   }
 };
 
+// Chat functions
 const loadUIDAta = () => {
   // Get chat rooms
   let rooms = getRooms();
 };
 
+const emitirMensaje = () => {
+  let input = $("#iMensaje")
+  socket.emit('sendMessage', input.val(), (error) => {
+
+      if (error) {
+          return console.log(error)
+      }
+
+      // Send message to the database
+      let datos = {
+        message: input.val()
+      };
+
+      $.ajax({
+        type: "POST",
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+        },
+        url: `/api/v1/mensajes/${selectedRoomVal}`,
+        data: JSON.stringify(datos),
+        contentType: "application/json"
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        alert(jqXHR.responseJSON.message);
+      });
+
+      // Reset input
+      input.val('');
+      input.focus()
+  })
+}
+
+const scroll = () => {
+  $('#dMensajes').scrollTop(10000);
+}
+
+const verificarCantidadMensajes = () => {
+  if($( "#messages" ).children().length > 50){
+    $( "#messages div" ).first().remove();
+  }
+}
+
+const obtenerUltimosMensajes = () => {
+  $.ajax({
+    type: "GET",
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    },
+    url: `/api/v1/mensajes/${selectedRoomVal}`,
+    contentType: "application/json"
+  })
+  .done(function (msjs) {
+    // Update UI
+    msjs.map((msj) => {
+      agregarMensaje({
+        username:  msj.user.username,
+        text: msj.message,
+        createdAt: msj.createdAt
+      });
+    });
+  })
+  .fail(function (jqXHR, textStatus, errorThrown) {
+    alert(jqXHR.responseJSON.message);
+  });
+}
+
+// DOM Events
+$( "#btnEnviar" ).click(function() {
+  emitirMensaje();
+});
+
+$("#iMensaje").keypress(function(e) {
+  if(e.which == 13 && $('#btnEnviar').is(':enabled')) {
+    e.preventDefault();
+    emitirMensaje();
+  }
+});
+
+$("#sRoom").change(function () {
+  // Left the previous room
+  if (selectedRoomVal != "0") {
+    socket.emit("leave", { username, selectedRoomText }, (error) => {
+      if (error) {
+        alert(error);
+        location.href = "/";
+      }
+      $("#messages").empty();
+    });
+  }
+
+  // Join the new room
+  if ($(this).val() != 0) {
+    let room = $("#sRoom option:selected").text();
+    selectedRoomVal = $(this).val();
+    selectedRoomText = room
+    $('#btnEnviar').prop('disabled', false);
+    socket.emit("join", { username, room }, (error) => {
+      if (error) {
+        alert(error);
+        location.href = "/";
+      }
+      obtenerUltimosMensajes();
+      $("#iMensaje").focus();
+    });
+  }else{
+    $('#btnEnviar').prop('disabled', true);
+    $("#sidebar").html('');
+  }
+});
+
+const agregarMensaje = (message) => {
+  const html = Mustache.render(messageTemplate, {
+    username: message.username,
+    message: message.text,
+    createdAt: moment(message.createdAt).format("h:mm a"),
+  });
+  $("#messages").append(html);
+  verificarCantidadMensajes();
+  scroll()
+}
+
+// Chat info
+const { username } = Qs.parse(location.search, { ignoreQueryPrefix: true });
+let selectedRoomVal = $("#sRoom option:selected").val();
+let selectedRoomText = $("#sRoom option:selected").text();
+
 // Mustache Templates
-const messageTemplate = $('#message-template').html();
-const sidebarTemplate = $('#sidebar-template').html();
+const messageTemplate = $("#message-template").html();
+const sidebarTemplate = $("#sidebar-template").html();
 
 // Listen to incoming notifications
-socket.on('message', (message) => {
-  console.log(message)
-  const html = Mustache.render(messageTemplate, {
-      username: message.username,
-      message: message.text,
-      createdAt: moment(message.createdAt).format('h:mm a')
-  })
-  $("#messages").append(html)
-  // autoscroll()
-})
+socket.on("message", (message) => {
+  // console.log(message);
+  agregarMensaje(message);
+});
 
-socket.on('roomData', ({ room, users }) => {
+socket.on("roomData", ({ room, users }) => {
   const html = Mustache.render(sidebarTemplate, {
-      room,
-      users
-  })
-  $('#sidebar').innerHTML = html
-})
+    room,
+    users,
+  });
+  $("#sidebar").html(html);
+});
 
-// Emit joining the room
-socket.emit('join', { username: 'Mario', room: 'Soocer' }, (error) => {
+// Emit just login the chat
+socket.emit("login", { username }, (error) => {
   if (error) {
-      alert(error)
-      location.href = '/'
+    alert(error);
+    location.href = "/";
   }
-})
+});

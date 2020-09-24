@@ -13,7 +13,7 @@ $("#btSI").click(function (e) {
     .done(function (response) {
       if (response.mensaje && response.mensaje == "Authorized User") {
         localStorage.setItem("Jobsity-Token", response.token);
-        location.replace("/chat.html");
+        location.replace("/chat.html?username="+$("#usernameSI").val());
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
@@ -37,7 +37,7 @@ $("#btSU").click(function (e) {
     .done(function (response) {
       if (response.mensaje && response.mensaje == "User Created") {
         localStorage.setItem("Jobsity-Token", response.token);
-        location.replace("/chat.html");
+        location.replace("/chat.html?username="+$("#usernameSU").val());
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
