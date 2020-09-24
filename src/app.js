@@ -5,6 +5,7 @@ const cors = require('cors')
 
 //Cargar rutas
 const rutasUsuario = require('./rutas/usuario')
+const rutasSala = require('./rutas/sala')
 
 const manejarErrores = require('./middlewares/manejarErrores')
 const {AppError} = require('./utils/errores');
@@ -19,10 +20,11 @@ const ruta = '/api/v1'
 
 //Establecer las rutas con su controlador
 app.get(ruta + '/', (req, res) => {
-    res.send({mensaje: 'Aplicación Iniciada'})
+    res.send({mensaje: 'API Deployed'})
 })
 
 app.use(ruta + '/usuarios',rutasUsuario)
+app.use(ruta + '/salas',rutasSala)
 
 app.all(ruta + '*', (req, res, next) => {
     next(new AppError(`La ruta ${req.originalUrl} no está disponible`, 404))
