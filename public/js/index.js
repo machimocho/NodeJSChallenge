@@ -52,11 +52,11 @@ if (token){
     beforeSend: function (xhr) {
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
     },
-    url: `/api/v1/usuarios/sistema`
+    url: `/api/v1/usuarios`
   })
     .done(function (response) {
-      if (response && response == "Valid Token") {
-        location.replace("/chat.html");
+      if (response) {
+        location.replace(`/chat.html?username=${response.username}`);
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
