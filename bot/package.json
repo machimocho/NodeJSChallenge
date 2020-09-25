@@ -1,0 +1,15 @@
+{
+  "name": "chatbot",
+  "version": "1.0.0",
+  "description": "Jobsity Chat Bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mario Antonio Alvarez Gómez",
+  "license": "ISC",
+  "dependencies": {
+    "get-csv": "^3.0.3",
+    "socket.io-client": "^2.3.0"
+  }
+}
