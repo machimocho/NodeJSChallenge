@@ -19,11 +19,20 @@ app.use(express.static(publicPath))
 require('./utils/conectarBD')
 
 // Initialize SocketIO
-const { generateMessage } = require('./utils/chat/messages')
+const { generateMessage, sendToDB } = require('./utils/chat/messages')
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/chat/users')
+
+let botSocket
 
 io.on('connection', (socket) => {
     console.log('New WebSocket connection')
+
+    socket.on('BotPong', (options, callback) => {
+        botSocket = socket
+        socket.broadcast.emit('message', generateMessage('Bot', options.data))
+
+        // callback()
+    })
 
     socket.on('login', (options, callback) => {
         socket.emit('message', generateMessage('Admin', `Welcome ${options.username}! Please choose a room.`))
@@ -50,10 +59,16 @@ io.on('connection', (socket) => {
         callback()
     })
 
-    socket.on('sendMessage', (message, callback) => {
+    socket.on('sendMessage', (data, callback) => {
         const user = getUser(socket.id)
-
-        io.to(user.room).emit('message', generateMessage(user.username, message))
+        
+        if (data.message.startsWith('/stock=')){
+            if (botSocket)
+                botSocket.emit('BotPing', data.message)
+        }else{
+            sendToDB(data.message, data.room, data.token)
+            io.to(user.room).emit('message', generateMessage(user.username, data.message))
+        }
         callback()
     })
 

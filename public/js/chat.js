@@ -55,29 +55,11 @@ const loadUIDAta = () => {
 
 const emitirMensaje = () => {
   let input = $("#iMensaje")
-  socket.emit('sendMessage', input.val(), (error) => {
+  socket.emit('sendMessage', {message:input.val(), token, room: selectedRoomVal}, (error) => {
 
       if (error) {
           return console.log(error)
       }
-
-      // Send message to the database
-      let datos = {
-        message: input.val()
-      };
-
-      $.ajax({
-        type: "POST",
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-        },
-        url: `/api/v1/mensajes/${selectedRoomVal}`,
-        data: JSON.stringify(datos),
-        contentType: "application/json"
-      })
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        alert(jqXHR.responseJSON.message);
-      });
 
       // Reset input
       input.val('');
