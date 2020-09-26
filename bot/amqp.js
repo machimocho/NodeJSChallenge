@@ -1,7 +1,7 @@
 const amqp = require("amqplib/callback_api");
 let ch = null;
 amqp.connect(
-  "amqps://ewsnvhkv:rkAYvLzGyd2rJU-I0BUFHumZegrRAfF6@coyote.rmq.cloudamqp.com/ewsnvhkv",
+  process.env.AMPQ_HOST,
   function (err, conn) {
     conn.createChannel(function (err, channel) {
       ch = channel;

@@ -1,4 +1,4 @@
-var socket = require("socket.io-client")(`http://localhost:9999`);
+var socket = require("socket.io-client")(`http://localhost:${process.env.PORT}`);
 const getCSV = require("get-csv");
 const { publishToQueue } = require("./amqp");
 const QUEUE = "BotQueue";
