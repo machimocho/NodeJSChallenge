@@ -4,8 +4,9 @@
   "description": "NodeJS Code Challenge",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon -r dotenv/config src/index.js"
+    "start": "node -r dotenv/config src/index.js",
+    "dev": "nodemon -r dotenv/config src/index.js",
+    "bot": "(cd bot && npm run start)"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
     "axios": "^0.20.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
@@ -31,7 +33,6 @@
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
-    "dotenv": "^8.2.0",
     "nodemon": "^2.0.4"
   }
 }
