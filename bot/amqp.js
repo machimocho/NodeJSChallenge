@@ -5,8 +5,9 @@ amqp.connect('amqps://ewsnvhkv:rkAYvLzGyd2rJU-I0BUFHumZegrRAfF6@coyote.rmq.cloud
     ch = channel;
   });
 });
-const publishToQueue = async (queueName, data) => {
+const publishToQueue = async (queueName, data, cb) => {
   ch.sendToQueue(queueName, new Buffer(data));
+  cb();
 };
 process.on("exit", (code) => {
   ch.close();

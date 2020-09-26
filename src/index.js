@@ -34,6 +34,21 @@ io.on('connection', (socket) => {
         // callback()
     })
 
+    socket.on('Queue Ready', (options, callback) => {
+        console.log('Queue Ready.');
+        let amqp = require('amqplib/callback_api');
+        const CONN_URL = 'amqps://ewsnvhkv:rkAYvLzGyd2rJU-I0BUFHumZegrRAfF6@coyote.rmq.cloudamqp.com/ewsnvhkv';
+        amqp.connect(CONN_URL, function (err, conn) {
+        conn.createChannel(function (err, ch) {
+            ch.consume('BotQueue', function (msg) {
+                socket.broadcast.to(options.socket).emit( 'message', generateMessage('Bot', msg.content.toString()) );
+            },{ noAck: true }
+            );
+        });
+        });
+        // callback()
+    })
+
     socket.on('login', (options, callback) => {
         socket.emit('message', generateMessage('Admin', `Welcome ${options.username}! Please choose a room.`))
 
@@ -63,8 +78,13 @@ io.on('connection', (socket) => {
         const user = getUser(socket.id)
         
         if (data.message.startsWith('/stock=')){
-            if (botSocket)
-                botSocket.emit('BotPing', data.message)
+            if (botSocket){
+                let info = {
+                    message : data.message,
+                    userSocket: socket.id
+                }
+                botSocket.emit('BotPing', info)
+            }
         }else{
             sendToDB(data.message, data.room, data.token)
             io.to(user.room).emit('message', generateMessage(user.username, data.message))
