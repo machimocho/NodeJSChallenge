@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node -r dotenv/config src/index.js",
     "dev": "nodemon -r dotenv/config src/index.js",
-    "bot": "(cd bot && npm run start)"
+    "bot": "npm(cd bot && npm install && npm run start)"
   },
   "repository": {
     "type": "git",
