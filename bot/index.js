@@ -1,6 +1,5 @@
 var socket = require("socket.io-client")(`http://localhost:9999`);
 const getCSV = require("get-csv");
-// import {publishToQueue} from './amqp'
 const { publishToQueue } = require("./amqp");
 const QUEUE = "BotQueue";
 
@@ -16,7 +15,6 @@ socket.on("BotPing", function (data) {
   getCSV(`https://stooq.com/q/l/?s=${stock}&f=sd2t2ohlcv&h&e=csv`)
     .then((rows) => {
       if (rows[0].Open == "N/D")
-        // console.log('Stock code not found. Try another one.')
         socket.emit("Queue Ready", {
           socket: data.userSocket,
           message: "Stock code not found. Try another one.",
