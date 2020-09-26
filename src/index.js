@@ -1,126 +1,168 @@
-const path = require('path')
-const http = require('http')
-const express = require('express')
-const socketio = require('socket.io')
+const path = require("path");
+const http = require("http");
+const express = require("express");
+const socketio = require("socket.io");
 
 //Cargar Aplicación
-const app = require('./app')
+const app = require("./app");
 
-const server = http.createServer(app)
-const io = socketio(server)
+const server = http.createServer(app);
+const io = socketio(server);
 
+const port = process.env.PORT;
+const publicPath = path.join(__dirname, "../public");
 
-const port = process.env.PORT
-const publicPath = path.join(__dirname, '../public')
-
-app.use(express.static(publicPath))
+app.use(express.static(publicPath));
 
 //Conectar a la Base de Datos
-require('./utils/conectarBD')
+require("./utils/conectarBD");
 
 // Initialize SocketIO
-const { generateMessage, sendToDB } = require('./utils/chat/messages')
-const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/chat/users')
+const { generateMessage, sendToDB } = require("./utils/chat/messages");
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom,
+} = require("./utils/chat/users");
 
-let botSocket
+let botSocket;
 
-io.on('connection', (socket) => {
-    console.log('New WebSocket connection')
+io.on("connection", (socket) => {
+  console.log("New WebSocket connection");
 
-    socket.on('BotPong', (options, callback) => {
-        botSocket = socket
-        socket.broadcast.emit('message', generateMessage('Bot', options.data))
+  socket.on("BotPong", (options, callback) => {
+    botSocket = socket;
+    socket.broadcast.emit("message", generateMessage("Bot", options.data));
+  });
 
-        // callback()
-    })
-
-    socket.on('Queue Ready', (options, callback) => {
-        console.log('Queue Ready.');
-        let amqp = require('amqplib/callback_api');
-        const CONN_URL = 'amqps://ewsnvhkv:rkAYvLzGyd2rJU-I0BUFHumZegrRAfF6@coyote.rmq.cloudamqp.com/ewsnvhkv';
-        amqp.connect(CONN_URL, function (err, conn) {
+  socket.on("Queue Ready", (options, callback) => {
+    if (options.found) {
+      let amqp = require("amqplib/callback_api");
+      const CONN_URL =
+        "amqps://ewsnvhkv:rkAYvLzGyd2rJU-I0BUFHumZegrRAfF6@coyote.rmq.cloudamqp.com/ewsnvhkv";
+      amqp.connect(CONN_URL, function (err, conn) {
         conn.createChannel(function (err, ch) {
-            ch.consume('BotQueue', function (msg) {
-                socket.broadcast.to(options.socket).emit( 'message', generateMessage('Bot', msg.content.toString()) );
-            },{ noAck: true }
-            );
+          ch.consume(
+            "BotQueue",
+            function (msg) {
+              socket.broadcast
+                .to(options.socket)
+                .emit(
+                  "message",
+                  generateMessage("Bot", msg.content.toString())
+                );
+            },
+            { noAck: true }
+          );
         });
-        });
-        // callback()
-    })
+      });
+    } else
+      socket.broadcast
+        .to(options.socket)
+        .emit("message", generateMessage("Bot", options.message));
+  });
 
-    socket.on('login', (options, callback) => {
-        socket.emit('message', generateMessage('Admin', `Welcome ${options.username}! Please choose a room.`))
+  socket.on("login", (options, callback) => {
+    socket.emit(
+      "message",
+      generateMessage(
+        "Admin",
+        `Welcome ${options.username}! Please choose a room.`
+      )
+    );
 
-        callback()
-    })
+    callback();
+  });
 
-    socket.on('join', (options, callback) => {
-        const { error, user } = addUser({ id: socket.id, ...options })
+  socket.on("join", (options, callback) => {
+    const { error, user } = addUser({ id: socket.id, ...options });
 
-        if (error) {
-            return callback(error)
-        }
+    if (error) {
+      return callback(error);
+    }
 
-        socket.join(user.room)
+    socket.join(user.room);
 
-        socket.emit('message', generateMessage('Admin', `You're now on ${user.room}`))
-        socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has joined!`))
-        io.to(user.room).emit('roomData', {
-            room: user.room,
-            users: getUsersInRoom(user.room)
-        })
+    socket.emit(
+      "message",
+      generateMessage("Admin", `You're now on ${user.room}`)
+    );
+    socket.broadcast
+      .to(user.room)
+      .emit(
+        "message",
+        generateMessage("Admin", `${user.username} has joined!`)
+      );
+    io.to(user.room).emit("roomData", {
+      room: user.room,
+      users: getUsersInRoom(user.room),
+    });
 
-        callback()
-    })
+    callback();
+  });
 
-    socket.on('sendMessage', (data, callback) => {
-        const user = getUser(socket.id)
-        
-        if (data.message.startsWith('/stock=')){
-            if (botSocket){
-                let info = {
-                    message : data.message,
-                    userSocket: socket.id
-                }
-                botSocket.emit('BotPing', info)
-            }
-        }else{
-            sendToDB(data.message, data.room, data.token)
-            io.to(user.room).emit('message', generateMessage(user.username, data.message))
-        }
-        callback()
-    })
+  socket.on("sendMessage", (data, callback) => {
+    const user = getUser(socket.id);
 
-    socket.on('leave', (options, callback) => {
-        const user = removeUser(socket.id)
-        if (user) {
-            socket.leave(user.room)
+    if (data.message.startsWith("/stock=")) {
+      if (botSocket) {
+        let info = {
+          message: data.message,
+          userSocket: socket.id,
+        };
+        botSocket.emit("BotPing", info);
+      }
+    } else {
+      sendToDB(data.message, data.room, data.token);
+      io.to(user.room).emit(
+        "message",
+        generateMessage(user.username, data.message)
+      );
+    }
+    callback();
+  });
 
-            // socket.emit('message', generateMessage('Admin', `You left ${user.room}`))
-            socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left the room!`))
-            io.to(user.room).emit('roomData', {
-                room: user.room,
-                users: getUsersInRoom(user.room)
-            })
-        }
+  socket.on("leave", (options, callback) => {
+    const user = removeUser(socket.id);
+    if (user) {
+      socket.leave(user.room);
 
-        callback()
-    })
+      // socket.emit('message', generateMessage('Admin', `You left ${user.room}`))
+      socket.broadcast
+        .to(user.room)
+        .emit(
+          "message",
+          generateMessage("Admin", `${user.username} has left the room!`)
+        );
+      io.to(user.room).emit("roomData", {
+        room: user.room,
+        users: getUsersInRoom(user.room),
+      });
+    }
 
-    socket.on('disconnect', () => {
-        const user = removeUser(socket.id)
+    callback();
+  });
 
-        if (user) {
-            io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has disconnected from the app!`))
-            io.to(user.room).emit('roomData', {
-                room: user.room,
-                users: getUsersInRoom(user.room)
-            })
-        }
-    })
-})
+  socket.on("disconnect", () => {
+    const user = removeUser(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        "message",
+        generateMessage(
+          "Admin",
+          `${user.username} has disconnected from the app!`
+        )
+      );
+      io.to(user.room).emit("roomData", {
+        room: user.room,
+        users: getUsersInRoom(user.room),
+      });
+    }
+  });
+});
 
 server.listen(port, () => {
-    console.log(`Chat server running on port --> ${port}`)
-})
+  console.log(`Chat server running on port --> ${port}`);
+});
