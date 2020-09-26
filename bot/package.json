@@ -9,6 +9,7 @@
   "author": "Mario Antonio Alvarez Gómez",
   "license": "ISC",
   "dependencies": {
+    "amqplib": "^0.6.0",
     "get-csv": "^3.0.3",
     "socket.io-client": "^2.3.0"
   }
