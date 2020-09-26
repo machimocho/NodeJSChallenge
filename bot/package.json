@@ -4,7 +4,7 @@
   "description": "Jobsity Chat Bot",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node -r dotenv/config index.js"
   },
   "author": "Mario Antonio Alvarez Gómez",
   "license": "ISC",
@@ -12,5 +12,8 @@
     "amqplib": "^0.6.0",
     "get-csv": "^3.0.3",
     "socket.io-client": "^2.3.0"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0"
   }
 }
