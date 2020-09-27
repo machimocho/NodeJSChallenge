@@ -84,13 +84,14 @@ const obtenerUltimosMensajes = () => {
       xhr.setRequestHeader("Authorization", `Bearer ${token}`);
     },
     url: `/api/v1/mensajes/${selectedRoomVal}`,
-    contentType: "application/json"
+    contentType: "application/json",
+    async: false
   })
   .done(function (msjs) {
     // Update UI
     msjs.map((msj) => {
       agregarMensaje({
-        username:  msj.user.username,
+        username:  msj.user[0].username,
         text: msj.message,
         createdAt: msj.createdAt
       });
@@ -142,12 +143,12 @@ $("#sRoom").change(function () {
     selectedRoomVal = $(this).val();
     selectedRoomText = room
     $('#btnEnviar').prop('disabled', false);
+    obtenerUltimosMensajes();
     socket.emit("join", { username, room }, (error) => {
       if (error) {
         alert(error);
         location.href = "/";
       }
-      obtenerUltimosMensajes();
       $("#iMensaje").focus();
     });
   }else{
