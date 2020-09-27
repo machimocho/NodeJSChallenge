@@ -1,0 +1,224 @@
+{
+	"info": {
+		"_postman_id": "706455cf-7104-4e91-9508-1f68930af06c",
+		"name": "Jobsity Chat Challenge",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Verificar API activa",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}",
+					"host": [
+						"{{url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar usuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e53d8982-c119-439e-9d81-2be6b1a6f6bf",
+						"exec": [
+							"if (pm.response.code == 201){",
+							"    pm.environment.set(\"token\", pm.response.json().token);",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"mario\",\n\t\"password\": \"12345\",\n\t\"password2\": \"12345\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/usuarios",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Veriricar Login",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/usuarios/sistema",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"usuarios",
+						"sistema"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener salas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/salas",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"salas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar sala",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"room\": \"Chess\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/salas",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"salas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener mensajes sala",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/mensajes/5f6c0f1dd3362121439b04cf",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"mensajes",
+						"5f6c0f1dd3362121439b04cf"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registrar mensaje sala",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"message\": \"Hola a las 22:37\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/mensajes/5f6c0f1dd3362121439b04cf",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"mensajes",
+						"5f6c0f1dd3362121439b04cf"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "e3b8802b-4f3b-46df-9888-482a7bdb3831",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "e8f2181e-ec1d-4a00-b431-64f9421dbddc",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
