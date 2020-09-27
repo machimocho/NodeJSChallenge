@@ -11,7 +11,7 @@ try{
     else
         url = process.env.BD_URL
 
-    mongoose.connect(url, options, () => console.log ('Conexión establecida a la base de datos.'))
+    mongoose.connect(url, options, () => console.log ('Connection to the database established'))
 } catch (e){
     console.log(e)
 }
