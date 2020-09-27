@@ -3,16 +3,16 @@ const request = require('supertest')
 const Usuario = require('../src/modelos/usuario')
 require('dotenv').config()
 
-const app = require('../app')
+const app = require('../src/app')
 
 const usuarioValido = {
-    nombre: 'Jobsity', 
+    username: 'Jobsity', 
     password: 'Acd12_', 
     password2: 'Acd12_'
 }
 
 describe('Rutas de Logueo', () => {
-    let tokenUsuarioCreacion, tokenUsuarioLogin;
+    let tokenUsuarioCreacion, tokenUsuarioLogin, userID;
 
     beforeAll(async () => {
         await mongoose.connect(process.env.BD_URL_TESTING, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }, (err) => {
@@ -29,108 +29,108 @@ describe('Rutas de Logueo', () => {
         done()
     })
 
-    it('debería crear un usuario', async (done) => {
+    it('should create a user', async (done) => {
         const res = await request(app)
-            .post('/usuarios/registrar')
+            .post('/api/v1/usuarios')
             .send(usuarioValido)
         expect(res.statusCode).toEqual(201)
         tokenUsuarioCreacion = res.body.token
         done()
     })  
 
-    it('no debería crear el mismo usuario', async (done) => {
+    it('should not create the same user', async (done) => {
         const res = await request(app)
-            .post('/usuarios/registrar')
+            .post('/api/v1/usuarios')
             .send(usuarioValido)
         expect(res.statusCode).toEqual(409)
         done()
     })
 
-    it('no debería ingresar con usuario inexistente', async (done) => {
+    it('should not login with unexisting user', async (done) => {
         const res = await request(app)
-            .post('/usuarios/login')
-            .send({email: 'invalido@mail.com', password: '123456'})
+            .post('/api/v1/usuarios')
+            .send({username: 'username', password: '123456'})
         expect(res.statusCode).toEqual(400)
         done()
     })
 
-    it('debería ingresar con usuario existente', async (done) => {
+    it('should login with existing user', async (done) => {
         const res = await request(app)
-            .post('/usuarios/login')
+            .post('api/v1/usuarios/login')
             .send({email: usuarioValido.email, password: usuarioValido.password})
         expect(res.statusCode).toEqual(200)
         tokenUsuarioLogin = res.body.token
         done()
     })
 
-    it('no debería usar la aplicación sin ingresar', async (done) => {
+    it('should not use the app without login', async (done) => {
         const res =  await request(app)
-            .get('/usuarios/sistema')
+            .get('/api/v1/usuarios/sistema')
         expect(res.statusCode).toEqual(401)
         done()
     })
 
-    it('no debería usar la aplicación usando token alterado', async (done) => {
+    it('shoult not use the app with altered token', async (done) => {
         const res =  await request(app)
-            .get('/usuarios/sistema')
+            .get('/api/v1/usuarios/sistema')
             .set('Authorization', 'Bearer ' + tokenUsuarioCreacion + '123')
         expect(res.statusCode).toEqual(401)
         done()
     })
 
-    it('debería usar la aplicación usando token(Creación)', async (done) => {
+    it('should use the app using registration token', async (done) => {
         const res =  await request(app)
-            .get('/usuarios/sistema')
+            .get('/api/v1/usuarios/sistema')
             .set('Authorization', 'Bearer ' + tokenUsuarioCreacion)
         expect(res.statusCode).toEqual(200)
         done()
     })
 
-    it('debería usar la aplicación usando token(Logueo)', async (done) => {
+    it('should use the app using login token', async (done) => {
         const res =  await request(app)
-            .get('/usuarios/sistema')
+            .get('/api/v1/usuarios/sistema')
             .set('Authorization', 'Bearer ' + tokenUsuarioLogin)
         expect(res.statusCode).toEqual(200)
         done()
     })
 
-    it('debería cerrar sesión (token Creación)', async (done) => {
+    it('shpukd close session (register token)', async (done) => {
         const res = await request(app)
-            .post('/usuarios/logout')
+            .post('/api/v1/usuarios/logout')
             .set('Authorization', 'Bearer ' + tokenUsuarioCreacion)
             .send()
         expect(res.statusCode).toEqual(200)
         done()
     })
 
-    it('no debería usar la aplicación usando token inválido(Creación)', async (done) => {
+    it('should not use the app with invalid token (registration token)', async (done) => {
         const res =  await request(app)
-            .get('/usuarios/sistema')
+            .get('/api/v1/usuarios/sistema')
             .set('Authorization', 'Bearer ' + tokenUsuarioCreacion)
         expect(res.statusCode).toEqual(401)
         done()
     })
 
-    it('debería seguir usando la aplicación usando token(Logueo)', async (done) => {
+    it('should use the app with valid token (login token)', async (done) => {
         const res =  await request(app)
-            .get('/usuarios/sistema')
+            .get('/api/v1/usuarios/sistema')
             .set('Authorization', 'Bearer ' + tokenUsuarioLogin)
         expect(res.statusCode).toEqual(200)
         done()
     })
 
-    it('debería cerrar todas las sesiones', async (done) => {
+    it('should close all sessions', async (done) => {
         const res = await request(app)
-            .post('/usuarios/logoutCompleto')
+            .post('/api/v1/usuarios/logoutCompleto')
             .set('Authorization', 'Bearer ' + tokenUsuarioLogin)
             .send()
         expect(res.statusCode).toEqual(200)
         done()
     })
 
-    it('no debería usar la aplicación usando token inválido(Logueo)', async (done) => {
+    it('should not use the app with invalid token (login token)', async (done) => {
         const res =  await request(app)
-            .get('/usuarios/sistema')
+            .get('/api/v1/usuarios/sistema')
             .set('Authorization', 'Bearer ' + tokenUsuarioLogin)
         expect(res.statusCode).toEqual(401)
         done()
