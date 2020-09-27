@@ -44,7 +44,7 @@ antonio/asdfg
 
 ## Requirements
 
-This aplication needs **NodeJS** installed and an instance of **MongoDB** and **RabbitMQ**. I have configured a cloud instance of both for convenience. The string connection  of both instences is included in the *.env* files in the root and bot folders.
+This aplication needs **NodeJS** installed and an instance of **MongoDB** and **RabbitMQ**. I have configured a cloud instance of both for convenience. The string connection  of both instences is included in the *.env* files in the root and bot folders. In the web app I used JQuery and Bootstrap, getting both from online sources.
 
 ## Running the app
 
