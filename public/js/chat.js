@@ -101,6 +101,17 @@ const obtenerUltimosMensajes = () => {
   });
 }
 
+const agregarMensaje = (message) => {
+  const html = Mustache.render(messageTemplate, {
+    username: message.username,
+    message: message.text,
+    createdAt: moment(message.createdAt).format("h:mm a"),
+  });
+  $("#messages").append(html);
+  verificarCantidadMensajes();
+  scroll()
+}
+
 // DOM Events
 $( "#btnEnviar" ).click(function() {
   emitirMensaje();
@@ -145,16 +156,23 @@ $("#sRoom").change(function () {
   }
 });
 
-const agregarMensaje = (message) => {
-  const html = Mustache.render(messageTemplate, {
-    username: message.username,
-    message: message.text,
-    createdAt: moment(message.createdAt).format("h:mm a"),
-  });
-  $("#messages").append(html);
-  verificarCantidadMensajes();
-  scroll()
-}
+$( "#btnCloseSession" ).click(function() {
+  $.ajax({
+    type: "POST",
+    url: `/api/v1/usuarios/logout`,
+    contentType: "application/json",
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    }
+  })
+    .done(function (response) {
+      localStorage.removeItem("Jobsity-Token");
+      location.replace("/");
+    })
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      alert(jqXHR.responseJSON.message);
+    });
+});
 
 // Chat info
 const { username } = Qs.parse(location.search, { ignoreQueryPrefix: true });
