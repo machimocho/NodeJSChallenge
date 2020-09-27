@@ -11,8 +11,8 @@ const usuarioValido = {
     password2: 'Acd12_'
 }
 
-describe('Rutas de Logueo', () => {
-    let tokenUsuarioCreacion, tokenUsuarioLogin, userID;
+describe('API routes', () => {
+    let tokenUsuarioCreacion, tokenUsuarioLogin;
 
     beforeAll(async () => {
         await mongoose.connect(process.env.BD_URL_TESTING, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }, (err) => {
@@ -50,14 +50,14 @@ describe('Rutas de Logueo', () => {
         const res = await request(app)
             .post('/api/v1/usuarios')
             .send({username: 'username', password: '123456'})
-        expect(res.statusCode).toEqual(400)
+        expect(res.statusCode).toEqual(422)
         done()
     })
 
     it('should login with existing user', async (done) => {
         const res = await request(app)
-            .post('api/v1/usuarios/login')
-            .send({email: usuarioValido.email, password: usuarioValido.password})
+            .post('/api/v1/usuarios/login')
+            .send({username: usuarioValido.username, password: usuarioValido.password})
         expect(res.statusCode).toEqual(200)
         tokenUsuarioLogin = res.body.token
         done()
@@ -94,7 +94,7 @@ describe('Rutas de Logueo', () => {
         done()
     })
 
-    it('shpukd close session (register token)', async (done) => {
+    it('should close session (register token)', async (done) => {
         const res = await request(app)
             .post('/api/v1/usuarios/logout')
             .set('Authorization', 'Bearer ' + tokenUsuarioCreacion)
@@ -111,7 +111,7 @@ describe('Rutas de Logueo', () => {
         done()
     })
 
-    it('should use the app with valid token (login token)', async (done) => {
+    it('should still use the app using login token', async (done) => {
         const res =  await request(app)
             .get('/api/v1/usuarios/sistema')
             .set('Authorization', 'Bearer ' + tokenUsuarioLogin)
