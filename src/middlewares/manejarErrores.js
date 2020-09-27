@@ -1,7 +1,7 @@
 const { AppError } = require("../utils/errores")
 
 const sendErrorDev = (err, res) => {
-  console.log('sendErrorDev')
+  // console.log('sendErrorDev')
   return res.status(err.statusCode).json({
     status: err.status,
     error: err,
@@ -17,7 +17,7 @@ const sendErrorProd = (err, res) => {
       message: err.message
     })
   } else {
-    console.error("ERROR 💥: ", err)
+    // console.error("ERROR 💥: ", err)
 
     return res.status(err.statusCode).json({
       status: err.status,
@@ -27,21 +27,21 @@ const sendErrorProd = (err, res) => {
 }
 
 const handleCastErrorDB = err => {
-  console.log('handleCastErrorDB')
+  // console.log('handleCastErrorDB')
   console.log(err)
   const message = `Valor inválido ${err.path}: ${err.value}`
   return new AppError(message, 400)
 }
 
 const handleDuplicateFieldsDB = err => {
-  console.log('handleDuplicateFieldsDB')
+  // console.log('handleDuplicateFieldsDB')
   const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0]
   const message = `Valor duplicado: ${value}. Favor de usar otro`
   return new AppError(message, 409)
 }
 
 const handleValidationErrorDB = err => {
-  console.log('handleValidationErrorDB')
+  // console.log('handleValidationErrorDB')
   const errors = Object.values(err.errors).map(el => el.message)
 
   const message = `Dato ingresado inválido. ${errors.join(". ")}`
@@ -75,7 +75,7 @@ const verificarTipoError = err => {
 }
 
 const manejarErrores = (err, req, res, next) => {
-  console.log(err)
+  // console.log(err)
   err.statusCode = err.statusCode || 500
   err.status = err.status || "error"
   let error
